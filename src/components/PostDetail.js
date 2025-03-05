@@ -1,49 +1,98 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
+import { fetchPostById, deletePost } from "../redux/slices/postsSlice";
+import {
+  Container,
+  Paper,
+  Typography,
+  Button,
+  Box,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 
 function PostDetail() {
   const { id } = useParams();
-  const [post, setPost] = useState(null);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const {
+    postDetail: post,
+    isLoading,
+    error,
+  } = useSelector((state) => state.posts);
+
   useEffect(() => {
-    axios
-      .get(`http://localhost:3000/posts/${id}`)
-      .then((response) => {
-        setPost(response.data);
-      })
-      .catch((error) => console.error(error));
-  }, [id]);
+    dispatch(fetchPostById(id));
+  }, [dispatch, id]);
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
-      axios
-        .delete(`http://localhost:3000/posts/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
-        .then(() => {
-          alert("Post deleted successfully!");
-          navigate("/");
-        })
-        .catch((error) => {
-          console.error(error);
-          alert("Failed to delete the post.");
-        });
+      dispatch(deletePost(id)).then(() => {
+        alert("Post deleted successfully!");
+        navigate("/");
+      });
     }
   };
 
-  if (!post) return <p>Loading...</p>;
+  if (isLoading) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 5, textAlign: "center" }}>
+        <CircularProgress color="primary" />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 5 }}>
+        <Alert severity="error">{error}</Alert>
+      </Container>
+    );
+  }
+
+  if (!post) return null;
 
   return (
-    <div>
-      <h2>{post.title}</h2>
-      <p>{post.content}</p>
-      <p>Author: {post.author}</p>
-      <button onClick={handleDelete}>Delete Post</button>
-    </div>
+    <Container maxWidth="md" sx={{ mt: 5 }}>
+      <Paper elevation={3} sx={{ p: 4, bgcolor: "#121212", color: "#e4e4e7" }}>
+        <Typography variant="h4" gutterBottom>
+          {post.title}
+        </Typography>
+        <Typography variant="body1" paragraph>
+          {post.content}
+        </Typography>
+        <Typography variant="subtitle1" color="#a3a3a3">
+          Author: {post.author}
+        </Typography>
+
+        <Box mt={3} display="flex" justifyContent="space-between">
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDelete}
+            sx={{
+              backgroundColor: "#d32f2f",
+              "&:hover": { backgroundColor: "#b71c1c" },
+            }}
+          >
+            Delete Post
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/")}
+            sx={{
+              backgroundColor: "#1e40af",
+              "&:hover": { backgroundColor: "#4b6cb7" },
+            }}
+          >
+            Back to Home
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
 

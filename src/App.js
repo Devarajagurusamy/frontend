@@ -9,32 +9,16 @@ import EditPost from "./components/EditPost";
 import PostDetail from "./components/PostDetail";
 import Home from "./components/Home";
 import LoginForm from "./components/LoginForm";
-import Logout from "./components/Logout";
 import Profile from "./components/Profile";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <Router>
       <div className="App">
-        
-        <div>
-          <nav>
-            <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/users">Users</a></li>
-            <li><a href="/signup">Sign Up</a></li>
-            <li><a href="/posts">Posts</a></li>
-            <li><a href="/posts/create">Create Post</a></li>
-            <li><a href="/login">Login</a></li>
-            <li><a href="/logout">Logout</a></li>
-            <li><a href="/profile">Profile</a></li>
-            </ul>
-          </nav>
-        </div>
-
+        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-
           <Route path="/users" element={<UserList />} />
           <Route path="/signup" element={<UserForm />} />
           <Route path="/edit/:id" element={<EditUser />} />
@@ -43,7 +27,6 @@ function App() {
           <Route path="/posts/:id" element={<PostDetail />} />
           <Route path="/posts/edit/:id" element={<EditPost />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/logout" element={<Logout />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
